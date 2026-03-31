@@ -1,22 +1,10 @@
-package com.petadoption.model;
+package com.petadoption.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
-import java.util.List;
 
-@Entity
-@Table(name = "adopter")
-public class Adopter {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int adopterId;
-
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+public class AdopterDTO {
 
     @NotBlank(message = "Name cannot be blank")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -31,16 +19,16 @@ public class Adopter {
     private String address;
 
     @NotBlank(message = "Experience level cannot be blank")
-    private String experienceLevel;
+    private String experienceLevel; // "Beginner", "Intermediate", "Advanced"
 
-    @OneToMany(mappedBy = "adopter", cascade = CascadeType.ALL)
-    private List<Adoption> adoptions;
+    public AdopterDTO() {}
 
-    public Adopter() {}
-
-    // Getters & Setters
-    public int getAdopterId() { return adopterId; }
-    public void setAdopterId(int adopterId) { this.adopterId = adopterId; }
+    public AdopterDTO(String name, String phone, String address, String experienceLevel) {
+        this.name = name;
+        this.phone = phone;
+        this.address = address;
+        this.experienceLevel = experienceLevel;
+    }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -53,10 +41,4 @@ public class Adopter {
 
     public String getExperienceLevel() { return experienceLevel; }
     public void setExperienceLevel(String experienceLevel) { this.experienceLevel = experienceLevel; }
-
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-
-    public List<Adoption> getAdoptions() { return adoptions; }
-    public void setAdoptions(List<Adoption> adoptions) { this.adoptions = adoptions; }
 }

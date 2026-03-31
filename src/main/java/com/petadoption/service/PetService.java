@@ -39,7 +39,7 @@ public class PetService {
             pet.setAge(updatedPet.getAge());
             pet.setGender(updatedPet.getGender());
             pet.setHealthStatus(updatedPet.getHealthStatus());
-            pet.setShelterId(updatedPet.getShelterId());
+            pet.setShelter(updatedPet.getShelter());
 
             return petRepository.save(pet);
         }
@@ -54,7 +54,9 @@ public class PetService {
     public List<PetDTO> getAvailablePetDTOs() {
         return petRepository.findByAdoptionStatus("Available")
                 .stream()
-                .map(p -> new PetDTO(p.getName(), p.getBreed(), p.getAdoptionStatus()))
+                .map(p -> new PetDTO(p.getName(), p.getSpecies(), p.getBreed(), p.getAge(), 
+                                     p.getGender(), p.getHealthStatus(), p.getAdoptionStatus(), 
+                                     p.getShelter() != null ? p.getShelter().getShelterId() : 0))
                 .toList();
     }
 }
