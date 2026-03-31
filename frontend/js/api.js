@@ -218,6 +218,14 @@ async function getAvegeAgeReport() {
     return apiCall('/reports/avg-age');
 }
 
+async function getAllMedicalRecords() {
+    return apiCall('/medical-records/all');
+}
+
+async function getAllVaccinations() {
+    return apiCall('/vaccinations/all');
+}
+
 // Utility functions
 function showError(message) {
     const errorDiv = document.createElement('div');

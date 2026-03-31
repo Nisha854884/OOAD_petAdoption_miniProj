@@ -55,8 +55,12 @@ function validateField(fieldName, value) {
 async function handleLogin(event) {
     event.preventDefault();
     
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
+    // const username = document.getElementById('username').value.trim();
+    // const password = document.getElementById('password').value;
+
+    // In auth.js, change these two lines:
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
     
     // Validation
     if (!username) {
@@ -120,7 +124,9 @@ async function handleSignup(event) {
     
     const username = document.getElementById('signup-username').value.trim();
     const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('signup-confirm-password').value;
+    // const confirmPassword = document.getElementById('signup-confirm-password').value;
+    // Change this line in auth.js:
+    const confirmPassword = document.getElementById('signup-password-confirm').value;
     
     // Validation
     if (!username) {
@@ -171,21 +177,43 @@ async function handleSignup(event) {
     }
 }
 
-// Toggle between login and signup
+// // Toggle between login and signup
+// function toggleAuthForm(tab) {
+//     const loginForm = document.getElementById('login-form');
+//     const signupForm = document.getElementById('signup-form');
+//     const loginTab = document.getElementById('login-tab');
+//     const signupTab = document.getElementById('signup-tab');
+    
+//     if (tab === 'login') {
+//         loginForm.style.display = 'block';
+//         signupForm.style.display = 'none';
+//         loginTab.classList.add('active');
+//         signupTab.classList.remove('active');
+//     } else {
+//         loginForm.style.display = 'none';
+//         signupForm.style.display = 'block';
+//         loginTab.classList.remove('active');
+//         signupTab.classList.add('active');
+//     }
+// }
+
 function toggleAuthForm(tab) {
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
-    const loginTab = document.querySelectorAll('.tab-btn')[0];
-    const signupTab = document.querySelectorAll('.tab-btn')[1];
-    
+    const buttons = document.querySelectorAll('.auth-tabs button');
+    const loginTab = buttons[0];
+    const signupTab = buttons[1];
+
+    if (!loginForm || !signupForm || !loginTab || !signupTab) return;
+
     if (tab === 'login') {
-        loginForm.style.display = 'block';
-        signupForm.style.display = 'none';
+        loginForm.classList.add('active');
+        signupForm.classList.remove('active');
         loginTab.classList.add('active');
         signupTab.classList.remove('active');
     } else {
-        loginForm.style.display = 'none';
-        signupForm.style.display = 'block';
+        loginForm.classList.remove('active');
+        signupForm.classList.add('active');
         loginTab.classList.remove('active');
         signupTab.classList.add('active');
     }

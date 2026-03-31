@@ -9,18 +9,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins(
-                    "http://localhost:8000",
-                    "http://localhost:3000",
-                    "http://localhost:5500",
-                    "http://127.0.0.1:8000",
-                    "http://127.0.0.1:3000",
-                    "http://127.0.0.1:5500"
-                )
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")  // allows all origins including IPv6
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
+                .allowCredentials(false)  // set false when using wildcard
                 .maxAge(3600);
     }
 }
