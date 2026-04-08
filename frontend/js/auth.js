@@ -87,10 +87,10 @@ async function handleLogin(event) {
             return;
         }
         
-        // Extract role from response
-        let role = 'Adopter'; // default
-        if (response.includes('Admin')) role = 'Admin';
-        if (response.includes('Staff')) role = 'Staff';
+        // Extract role from response and normalize for consistent checks.
+        let role = 'ADOPTER';
+        if (response.includes('Admin')) role = 'ADMIN';
+        if (response.includes('Staff')) role = 'STAFF';
         
         // Store user info
         const userData = {
@@ -104,9 +104,9 @@ async function handleLogin(event) {
         
         // Redirect based on role
         setTimeout(() => {
-            if (role === 'Admin') {
+            if (role === 'ADMIN') {
                 window.location.href = 'admin-dashboard.html';
-            } else if (role === 'Staff') {
+            } else if (role === 'STAFF') {
                 window.location.href = 'staff-dashboard.html';
             } else {
                 window.location.href = 'adopter-dashboard.html';
@@ -230,9 +230,10 @@ function checkAuthStatus() {
 function preventLoggedInAccess() {
     if (isLoggedIn()) {
         const user = getCurrentUser();
-        if (user.role === 'Admin') {
+        const role = (user.role || '').toUpperCase();
+        if (role === 'ADMIN') {
             window.location.href = 'admin-dashboard.html';
-        } else if (user.role === 'Staff') {
+        } else if (role === 'STAFF') {
             window.location.href = 'staff-dashboard.html';
         } else {
             window.location.href = 'adopter-dashboard.html';

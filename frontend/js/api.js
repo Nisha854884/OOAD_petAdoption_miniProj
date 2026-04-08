@@ -37,11 +37,12 @@ async function apiCall(endpoint, method = 'GET', data = null) {
         const response = await fetch(url.toString(), options);
         
         if (!response.ok) {
+            const errorText = await response.text();
             if (response.status === 403) {
                 showError('Access Denied: You do not have permission to perform this action');
                 return null;
             }
-            throw new Error(`HTTP ${response.status}`);
+            throw new Error(errorText || `HTTP ${response.status}`);
         }
         
         const contentType = response.headers.get('content-type');
@@ -66,7 +67,7 @@ async function login(username, password) {
 }
 
 async function signup(username, password) {
-    return apiCall('/auth/signup', 'POST', { username, password, role: 'Adopter' });
+    return apiCall('/auth/signup', 'POST', { username, password });
 }
 
 // Pet APIs

@@ -2,6 +2,7 @@ package com.petadoption.controller;
 
 import com.petadoption.model.User;
 import com.petadoption.service.AuthService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +41,8 @@ public class AuthController {
             user.setCreatedAt(java.time.LocalDateTime.now());
             authService.signup(user);
             return ResponseEntity.ok("Signup successful!");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body("Signup failed: Username already exists");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Signup failed: " + e.getMessage());
         }

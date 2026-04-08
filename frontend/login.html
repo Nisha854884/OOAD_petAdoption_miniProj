@@ -245,16 +245,8 @@
 
             if (!isValid) return;
 
-            // Prepare signup data
-            const signupData = {
-                username: username,
-                email: email,
-                password: password,
-                role: role
-            };
-
             try {
-                const result = await signup(signupData);
+                const result = await signup(username, password);
                 
                 if (result) {
                     showSuccess('Account created successfully! Redirecting to login...');

@@ -17,26 +17,34 @@ cd OOAD_petAdoption_miniProj
 
 # Update database credentials in src/main/resources/application.properties
 # Then run:
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
 **Wait for:** `Started PetadoptionApplication in X.XXX seconds`
 
-## Step 2: Start Frontend (1 min)
+## Step 2: Frontend Access (1 min)
+
+The frontend is served by Spring Boot from the `frontend/` folder.
+
+```bash
+open http://localhost:8081/api/
+```
+
+Optional fallback (only if you want a separate static server):
 
 ```bash
 cd frontend
 
 # Using Python 3:
-python -m http.server 8000
+python3 -m http.server 8010
 
 # OR Node.js:
-http-server
+http-server -p 8010
 ```
 
 ## Step 3: Access Application (2 min)
 
-Open browser to: **`http://localhost:8000`**
+Open browser to: **`http://localhost:8081/api/`**
 
 ### First Time?
 1. Click "Sign Up" on login page
@@ -51,20 +59,20 @@ Open browser to: **`http://localhost:8000`**
 ## 📊 What You Can Do
 
 ### As Admin
-- View `http://localhost:8000/admin-dashboard.html`
+- View `http://localhost:8081/api/admin-dashboard.html`
 - Add shelters, pets, vets
 - Manage staff and admins
 - Approve/reject adoptions
 - View reports
 
 ### As Staff
-- View `http://localhost:8000/staff-dashboard.html`
+- View `http://localhost:8081/api/staff-dashboard.html`
 - Manage pets
 - Add medical records
 - Track vaccinations
 
 ### As Adopter
-- View `http://localhost:8000/adopter-dashboard.html`
+- View `http://localhost:8081/api/adopter-dashboard.html`
 - Browse available pets
 - Apply for adoption
 - Track applications
@@ -77,12 +85,12 @@ Open browser to: **`http://localhost:8000`**
 - Try: `mvn clean install -DskipTests && mvn spring-boot:run`
 
 **Frontend shows "Cannot GET"?**
-- Make sure you're on `http://localhost:8000`
+- Make sure you're on `http://localhost:8081/api/`
 - Not `http://localhost` or `http://localhost:8080`
 
 **Login not working?**
 - Check browser console (F12) for errors
-- Verify backend is running: `curl http://localhost:8080/api/pets/all?role=ADMIN`
+- Verify backend is running: `curl http://localhost:8081/api/pets/all?role=Admin`
 
 ## 📚 Full Documentation
 
@@ -92,8 +100,8 @@ Open browser to: **`http://localhost:8000`**
 
 ## ✅ Quick Checklist
 
-- [ ] Backend running on `http://localhost:8080`
-- [ ] Frontend running on `http://localhost:8000`
+- [ ] Backend running on `http://localhost:8081/api`
+- [ ] Frontend reachable at `http://localhost:8081/api/`
 - [ ] Can access landing page
 - [ ] Can sign up new account
 - [ ] Can login
