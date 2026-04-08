@@ -145,8 +145,8 @@
         </div>
     </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/api.js?v=20260408"></script>
+    <script src="js/auth.js?v=20260408"></script>
     <script>
         // Check if user is logged in and redirect accordingly
         window.addEventListener('DOMContentLoaded', function() {
@@ -168,17 +168,18 @@
                 setTimeout(() => {
                     switch((user.role || '').toUpperCase()) {
                         case 'ADMIN':
-                            window.location.href = 'admin-dashboard.html';
+                            window.location.href = 'admin-dashboard.html?v=20260408r2';
                             break;
                         case 'STAFF':
-                            window.location.href = 'staff-dashboard.html';
+                            window.location.href = 'staff-dashboard.html?v=20260408r2';
                             break;
                         case 'ADOPTER':
-                            window.location.href = 'adopter-dashboard.html';
+                            window.location.href = 'adopter-dashboard.html?v=20260408r2';
                             break;
                         default:
-                            console.log('Unknown role:', user.role);
-                            // Stay on landing page if role is unknown
+                            console.log('Unknown role, clearing stale session:', user.role);
+                            localStorage.removeItem('currentUser');
+                            window.location.href = 'login.html';
                     }
                 }, 1000);
             }

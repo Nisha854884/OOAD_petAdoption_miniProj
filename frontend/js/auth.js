@@ -81,21 +81,30 @@ async function handleLogin(event) {
     
     try {
         const response = await login(username, password);
-        
-        if (response.includes('Invalid credentials')) {
-            showError('Invalid username or password');
-            return;
-        }
-        
-        // Extract role from response using backend role casing.
+
         let role = 'Adopter';
-        if (response.includes('Admin')) role = 'Admin';
-        if (response.includes('Staff')) role = 'Staff';
+        let userId = null;
+        let adopterId = null;
+
+        if (typeof response === 'string') {
+            if (response.includes('Invalid credentials')) {
+                showError('Invalid username or password');
+                return;
+            }
+            if (response.includes('Admin')) role = 'Admin';
+            if (response.includes('Staff')) role = 'Staff';
+        } else {
+            role = response.role || role;
+            userId = response.userId || null;
+            adopterId = response.adopterId || null;
+        }
         
         // Store user info
         const userData = {
             username: username,
             role: role,
+            userId: userId,
+            adopterId: adopterId,
             loginTime: new Date().toISOString()
         };
         localStorage.setItem('currentUser', JSON.stringify(userData));
@@ -106,11 +115,11 @@ async function handleLogin(event) {
         setTimeout(() => {
             const normalizedRole = role.toUpperCase();
             if (normalizedRole === 'ADMIN') {
-                window.location.href = 'admin-dashboard.html';
+                window.location.href = 'admin-dashboard.html?v=20260408r2';
             } else if (normalizedRole === 'STAFF') {
-                window.location.href = 'staff-dashboard.html';
+                window.location.href = 'staff-dashboard.html?v=20260408r2';
             } else {
-                window.location.href = 'adopter-dashboard.html';
+                window.location.href = 'adopter-dashboard.html?v=20260408r2';
             }
         }, 1000);
         
@@ -158,7 +167,12 @@ async function handleSignup(event) {
     }
     
     try {
-        const response = await signup(username, password);
+        const response = await signup(username, password, 'Adopter', {
+            name: username,
+            phone: '0000000000',
+            address: 'Address not provided',
+            experienceLevel: 'Beginner'
+        });
         
         if (response && response.includes('successful')) {
             showSuccess('Signup successful! Please login.');
@@ -224,6 +238,17 @@ function toggleAuthForm(tab) {
 function checkAuthStatus() {
     if (!isLoggedIn()) {
         window.location.href = 'login.html';
+        return;
+    }
+
+    const user = getCurrentUser();
+    const role = (user.role || '').toUpperCase();
+    const validRoles = ['ADMIN', 'STAFF', 'ADOPTER'];
+
+    if (!validRoles.includes(role)) {
+        // Clear stale/corrupt session data so user can log in again cleanly.
+        localStorage.removeItem('currentUser');
+        window.location.href = 'login.html';
     }
 }
 
@@ -232,12 +257,19 @@ function preventLoggedInAccess() {
     if (isLoggedIn()) {
         const user = getCurrentUser();
         const role = (user.role || '').toUpperCase();
+        const validRoles = ['ADMIN', 'STAFF', 'ADOPTER'];
+
+        if (!validRoles.includes(role)) {
+            localStorage.removeItem('currentUser');
+            return;
+        }
+
         if (role === 'ADMIN') {
-            window.location.href = 'admin-dashboard.html';
+            window.location.href = 'admin-dashboard.html?v=20260408r2';
         } else if (role === 'STAFF') {
-            window.location.href = 'staff-dashboard.html';
+            window.location.href = 'staff-dashboard.html?v=20260408r2';
         } else {
-            window.location.href = 'adopter-dashboard.html';
+            window.location.href = 'adopter-dashboard.html?v=20260408r2';
         }
     }
 }

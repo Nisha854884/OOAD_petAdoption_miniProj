@@ -1,11 +1,15 @@
 package com.petadoption.controller;
 
+import com.petadoption.model.Adopter;
 import com.petadoption.model.User;
 import com.petadoption.service.AuthService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -16,11 +20,17 @@ public class AuthController {
     // LOGIN
     @PostMapping("/login")
     @ResponseBody
-    public ResponseEntity<String> login(@RequestParam String username,
-                                        @RequestParam String password) {
+    public ResponseEntity<?> login(@RequestParam String username,
+                                   @RequestParam String password) {
         User user = authService.login(username, password);
         if (user != null) {
-            return ResponseEntity.ok("Login successful! Role: " + user.getRole());
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login successful");
+            response.put("username", user.getUsername());
+            response.put("role", user.getRole().name());
+            response.put("userId", user.getUserId());
+            response.put("adopterId", user.getAdopter() != null ? user.getAdopter().getAdopterId() : null);
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
@@ -28,7 +38,13 @@ public class AuthController {
     
     // SIGNUP
     // Add this inner class or create a separate file
-    record SignupRequest(String username, String password, String role) {}
+    record SignupRequest(String username,
+                         String password,
+                         String role,
+                         String name,
+                         String phone,
+                         String address,
+                         String experienceLevel) {}
 
     private User.Role parseRole(String role) {
         if (role == null || role.isBlank()) {
@@ -51,6 +67,17 @@ public class AuthController {
             user.setPassword(request.password());
             user.setRole(parseRole(request.role()));
             user.setCreatedAt(java.time.LocalDateTime.now());
+
+            if (user.getRole() == User.Role.Adopter) {
+                Adopter adopter = new Adopter();
+                adopter.setUser(user);
+                adopter.setName(request.name() != null && !request.name().isBlank() ? request.name() : request.username());
+                adopter.setPhone(request.phone() != null && !request.phone().isBlank() ? request.phone() : "0000000000");
+                adopter.setAddress(request.address() != null && !request.address().isBlank() ? request.address() : "Address not provided");
+                adopter.setExperienceLevel(request.experienceLevel() != null && !request.experienceLevel().isBlank() ? request.experienceLevel() : "Beginner");
+                user.setAdopter(adopter);
+            }
+
             authService.signup(user);
             return ResponseEntity.ok("Signup successful!");
         } catch (IllegalArgumentException e) {

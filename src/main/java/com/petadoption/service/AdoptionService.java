@@ -49,6 +49,16 @@ public class AdoptionService {
         return adoptionRepository.findByAdopter_AdopterId(adopterId);
     }
 
+    // VIEW ALL ADOPTIONS (Admin/Staff)
+    public List<Adoption> getAllAdoptions() {
+        return adoptionRepository.findAll();
+    }
+
+    // VIEW ONE ADOPTION (Admin/Staff)
+    public Adoption getAdoptionById(int adoptionId) {
+        return adoptionRepository.findById(adoptionId).orElse(null);
+    }
+
     // APPROVE / REJECT (Admin)
     public Adoption updateStatus(int adoptionId, String status) {
 

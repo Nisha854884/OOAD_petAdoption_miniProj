@@ -18,15 +18,17 @@ async function displayAdoptionRequests(containerId) {
             '</tr></thead><tbody>';
         
         adoptions.forEach(adoption => {
+            const status = adoption.status || adoption.adoptionStatus || 'Pending';
+            const requestDate = adoption.adoptionDate || adoption.requestDate || 'N/A';
             html += `
                 <tr>
                     <td>${adoption.pet?.name || 'N/A'}</td>
                     <td>${adoption.adopter?.name || 'N/A'}</td>
-                    <td><span class="status ${adoption.adoptionStatus.toLowerCase()}">${adoption.adoptionStatus}</span></td>
-                    <td>${adoption.requestDate}</td>
+                    <td><span class="status ${String(status).toLowerCase()}">${status}</span></td>
+                    <td>${requestDate}</td>
                     <td>
                         <button onclick="viewAdoptionDetails(${adoption.adoptionId})" class="btn-small">View</button>
-                        ${adoption.adoptionStatus === 'Pending' ? `
+                        ${status === 'Pending' ? `
                             <button onclick="approveAdoption(${adoption.adoptionId})" class="btn-small success">Approve</button>
                             <button onclick="rejectAdoption(${adoption.adoptionId})" class="btn-small danger">Reject</button>
                         ` : ''}
@@ -57,13 +59,14 @@ async function displayMyAdoptions(containerId) {
         
         let html = '<div class="adoptions-list">';
         adoptions.forEach(adoption => {
+            const status = adoption.status || adoption.adoptionStatus || 'Pending';
+            const requestDate = adoption.adoptionDate || adoption.requestDate || 'N/A';
             html += `
                 <div class="adoption-card">
                     <h3>${adoption.pet?.name || 'N/A'}</h3>
                     <p><strong>Species:</strong> ${adoption.pet?.species || 'N/A'}</p>
-                    <p><strong>Status:</strong> <span class="status ${adoption.adoptionStatus.toLowerCase()}">${adoption.adoptionStatus}</span></p>
-                    <p><strong>Request Date:</strong> ${adoption.requestDate}</p>
-                    <p><strong>Approval Date:</strong> ${adoption.approvalDate || 'Pending'}</p>
+                    <p><strong>Status:</strong> <span class="status ${String(status).toLowerCase()}">${status}</span></p>
+                    <p><strong>Request Date:</strong> ${requestDate}</p>
                     <button onclick="viewAdoptionDetails(${adoption.adoptionId})" class="btn-small">View Details</button>
                 </div>
             `;
@@ -88,9 +91,8 @@ async function viewAdoptionDetails(adoptionId) {
                     <div class="adoption-details">
                         <p><strong>Pet:</strong> ${adoption.pet?.name || 'N/A'}</p>
                         <p><strong>Adopter:</strong> ${adoption.adopter?.name || 'N/A'}</p>
-                        <p><strong>Adoption Status:</strong> ${adoption.adoptionStatus}</p>
-                        <p><strong>Request Date:</strong> ${adoption.requestDate}</p>
-                        <p><strong>Approval Date:</strong> ${adoption.approvalDate || 'Not Approved'}</p>
+                        <p><strong>Adoption Status:</strong> ${adoption.status || adoption.adoptionStatus || 'Pending'}</p>
+                        <p><strong>Request Date:</strong> ${adoption.adoptionDate || adoption.requestDate || 'N/A'}</p>
                         ${adoption.notes ? `<p><strong>Notes:</strong> ${adoption.notes}</p>` : ''}
                     </div>
                 </div>
@@ -133,15 +135,7 @@ async function adoptPet(petId) {
 async function confirmAdoption(petId) {
     try {
         const user = getCurrentUser();
-        
-        const adoptionData = {
-            adopterId: user.userId,
-            petId: petId,
-            requestDate: new Date().toISOString().split('T')[0],
-            adoptionStatus: 'Pending'
-        };
-        
-        const result = await requestAdoption(adoptionData);
+        const result = await requestAdoption(petId, user.adopterId);
         
         if (result) {
             showSuccess('Adoption request submitted successfully!');
@@ -159,12 +153,7 @@ async function approveAdoption(adoptionId) {
     if (!confirm('Are you sure you want to approve this adoption?')) return;
     
     try {
-        const adoptionData = {
-            adoptionStatus: 'Approved',
-            approvalDate: new Date().toISOString().split('T')[0]
-        };
-        
-        const result = await updateAdoptionStatus(adoptionId, adoptionData);
+        const result = await updateAdoptionStatus(adoptionId, 'Approved');
         
         if (result) {
             showSuccess('Adoption approved successfully!');
@@ -182,12 +171,7 @@ async function rejectAdoption(adoptionId) {
     if (!reason) return;
     
     try {
-        const adoptionData = {
-            adoptionStatus: 'Rejected',
-            notes: reason
-        };
-        
-        const result = await updateAdoptionStatus(adoptionId, adoptionData);
+        const result = await updateAdoptionStatus(adoptionId, 'Rejected');
         
         if (result) {
             showSuccess('Adoption request rejected');
@@ -232,9 +216,9 @@ async function displayAdoptionStatistics(containerId) {
             return;
         }
         
-        const approved = adoptions.filter(a => a.adoptionStatus === 'Approved').length;
-        const pending = adoptions.filter(a => a.adoptionStatus === 'Pending').length;
-        const rejected = adoptions.filter(a => a.adoptionStatus === 'Rejected').length;
+        const approved = adoptions.filter(a => (a.status || a.adoptionStatus) === 'Approved').length;
+        const pending = adoptions.filter(a => (a.status || a.adoptionStatus) === 'Pending').length;
+        const rejected = adoptions.filter(a => (a.status || a.adoptionStatus) === 'Rejected').length;
         
         const html = `
             <div class="statistics-grid">
@@ -277,7 +261,7 @@ async function exportAdoptionReport() {
         let csv = 'Pet Name,Species,Breed,Adopter Name,Status,Request Date,Approval Date\n';
         
         report.forEach(adoption => {
-            csv += `${adoption.pet?.name || 'N/A'},${adoption.pet?.species || 'N/A'},${adoption.pet?.breed || 'N/A'},${adoption.adopter?.name || 'N/A'},${adoption.adoptionStatus},${adoption.requestDate},${adoption.approvalDate || 'N/A'}\n`;
+            csv += `${adoption.pet?.name || 'N/A'},${adoption.pet?.species || 'N/A'},${adoption.pet?.breed || 'N/A'},${adoption.adopter?.name || 'N/A'},${adoption.status || adoption.adoptionStatus || 'Pending'},${adoption.adoptionDate || adoption.requestDate || 'N/A'},${adoption.approvalDate || 'N/A'}\n`;
         });
         
         // Create download link

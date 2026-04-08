@@ -137,10 +137,10 @@
         </div>
     </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/pets.js"></script>
-    <script src="js/adoptions.js"></script>
+    <script src="js/api.js?v=20260408"></script>
+    <script src="js/auth.js?v=20260408"></script>
+    <script src="js/pets.js?v=20260408"></script>
+    <script src="js/adoptions.js?v=20260408"></script>
     <script>
         // Initialize admin dashboard
         window.addEventListener('DOMContentLoaded', function() {
@@ -148,7 +148,16 @@
             const user = getCurrentUser();
             const role = (user.role || '').toUpperCase();
             if (role !== 'ADMIN') {
-                alert('Access denied. This dashboard is for admins only.');
+                if (role === 'STAFF') {
+                    window.location.href = 'staff-dashboard.html?v=20260408r2';
+                    return;
+                }
+                if (role === 'ADOPTER') {
+                    window.location.href = 'adopter-dashboard.html?v=20260408r2';
+                    return;
+                }
+                alert('Session invalid. Please login again.');
+                localStorage.removeItem('currentUser');
                 window.location.href = 'login.html';
                 return;
             }

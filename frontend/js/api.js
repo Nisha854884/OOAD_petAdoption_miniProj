@@ -71,11 +71,27 @@ async function login(username, password) {
     const response = await fetch(`${API_BASE_URL}/auth/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
         method: 'POST'
     });
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `HTTP ${response.status}`);
+    }
+    if (contentType.includes('application/json')) {
+        return await response.json();
+    }
     return await response.text();
 }
 
-async function signup(username, password, role = 'Adopter') {
-    return apiCall('/auth/signup', 'POST', { username, password, role });
+async function signup(username, password, role = 'Adopter', profile = null) {
+    return apiCall('/auth/signup', 'POST', {
+        username,
+        password,
+        role,
+        name: profile?.name,
+        phone: profile?.phone,
+        address: profile?.address,
+        experienceLevel: profile?.experienceLevel
+    });
 }
 
 // Pet APIs
@@ -177,15 +193,32 @@ async function deleteVaccination(id) {
 
 // Adoption APIs
 async function requestAdoption(petId, adopterId) {
-    return apiCall('/adoptions/request', 'POST', { petId, adopterId });
+    if (!adopterId) {
+        showError('Adopter profile not found. Please contact admin.');
+        return null;
+    }
+    return apiCall(`/adoption/request?petId=${encodeURIComponent(petId)}&adopterId=${encodeURIComponent(adopterId)}`, 'POST');
 }
 
 async function getMyAdoptions() {
-    return apiCall('/adoptions/view');
+    const user = getCurrentUser();
+    if (!user.adopterId) {
+        return [];
+    }
+    return apiCall(`/adoption/my/${user.adopterId}`);
 }
 
 async function updateAdoptionStatus(adoptionId, status) {
-    return apiCall(`/adoptions/approve/${adoptionId}`, 'PUT', { status });
+    const targetStatus = typeof status === 'string' ? status : status?.adoptionStatus || 'Pending';
+    return apiCall(`/adoption/update/${adoptionId}?status=${encodeURIComponent(targetStatus)}`, 'PUT');
+}
+
+async function getAllAdoptions() {
+    return apiCall('/adoption/all');
+}
+
+async function getAdoptionById(adoptionId) {
+    return apiCall(`/adoption/${adoptionId}`);
 }
 
 // Staff APIs

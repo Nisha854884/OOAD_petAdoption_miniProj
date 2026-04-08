@@ -14,6 +14,24 @@ public class AdoptionController {
     @Autowired
     private AdoptionService adoptionService;
 
+    // VIEW ALL ADOPTIONS (Admin/Staff)
+    @GetMapping("/all")
+    public List<Adoption> getAllAdoptions(@RequestParam String role) {
+        if (!role.equals("Admin") && !role.equals("Staff")) {
+            return List.of();
+        }
+        return adoptionService.getAllAdoptions();
+    }
+
+    // VIEW ONE ADOPTION (Admin/Staff)
+    @GetMapping("/{id}")
+    public Adoption getAdoptionById(@PathVariable int id, @RequestParam String role) {
+        if (!role.equals("Admin") && !role.equals("Staff")) {
+            return null;
+        }
+        return adoptionService.getAdoptionById(id);
+    }
+
     // REQUEST ADOPTION (Adopter only)
     @PostMapping("/request")
     public String requestAdoption(@RequestParam int petId,
