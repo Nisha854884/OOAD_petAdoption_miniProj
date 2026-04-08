@@ -16,8 +16,12 @@ If not, see `DEPLOYMENT.md` for setup.
 cd OOAD_petAdoption_miniProj
 
 # Update database credentials in src/main/resources/application.properties
-# Then run:
-./mvnw spring-boot:run
+# Then run (recommended):
+chmod +x run_backend.sh
+./run_backend.sh
+
+# Alternative (direct Maven):
+# ./mvnw spring-boot:run
 ```
 
 **Wait for:** `Started PetadoptionApplication in X.XXX seconds`
@@ -82,7 +86,8 @@ Open browser to: **`http://localhost:8081/api/`**
 **Backend won't start?**
 - Check MySQL is running
 - Update database credentials in `application.properties`
-- Try: `mvn clean install -DskipTests && mvn spring-boot:run`
+- Try: `./run_backend.sh`
+- If needed: `./mvnw clean install -DskipTests && ./mvnw spring-boot:run`
 
 **Frontend shows "Cannot GET"?**
 - Make sure you're on `http://localhost:8081/api/`
