@@ -1,5 +1,6 @@
 package com.petadoption.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -30,12 +31,15 @@ public class Shelter {
     private String contactNo;
 
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Pet> pets;
 
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Staff> staff;
 
     @OneToMany(mappedBy = "shelter", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Vet> vets;
 
     // Constructors

@@ -23,6 +23,11 @@ public class PetService {
         return petRepository.findByAdoptionStatus("Available");
     }
 
+    // VIEW SINGLE PET
+    public Pet getPetById(int id) {
+        return petRepository.findById(id).orElse(null);
+    }
+
     // ADD PET
     public Pet addPet(Pet pet) {
         return petRepository.save(pet);

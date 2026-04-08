@@ -81,7 +81,11 @@ async function displayMyAdoptions(containerId) {
 // View adoption details
 async function viewAdoptionDetails(adoptionId) {
     try {
-        const adoption = await getAdoptionById(adoptionId);
+        const adoption = await getAdoptionByIdForCurrentUser(adoptionId);
+        if (!adoption) {
+            showError('Adoption details not found');
+            return;
+        }
         
         let html = `
             <div class="details-modal">
@@ -109,6 +113,10 @@ async function viewAdoptionDetails(adoptionId) {
 async function adoptPet(petId) {
     try {
         const pet = await getPetById(petId);
+        if (!pet) {
+            showError('Pet not found');
+            return;
+        }
         
         const html = `
             <div class="form-modal">
@@ -135,6 +143,10 @@ async function adoptPet(petId) {
 async function confirmAdoption(petId) {
     try {
         const user = getCurrentUser();
+        if (!user.adopterId) {
+            showError('Session missing adopter profile. Please logout and login again.');
+            return;
+        }
         const result = await requestAdoption(petId, user.adopterId);
         
         if (result) {
@@ -142,6 +154,7 @@ async function confirmAdoption(petId) {
             closeModal();
             // Reload available pets
             displayAvailablePets('available-pets-container');
+            displayMyAdoptions('my-adoptions-container');
         }
     } catch (error) {
         showError('Error submitting adoption request');
@@ -192,11 +205,13 @@ async function getAllAvailablePetsForAdoption() {
     }
 }
 
-// Get adoption by ID
-async function getAdoptionById(adoptionId) {
+// Get adoption by ID for current user's scope
+async function getAdoptionByIdForCurrentUser(adoptionId) {
     try {
-        const adoptions = await getAllAdoptions();
-        return adoptions.find(a => a.adoptionId === adoptionId);
+        const user = getCurrentUser();
+        const role = (user.role || '').toUpperCase();
+        const adoptions = role === 'ADOPTER' ? await getMyAdoptions() : await getAllAdoptions();
+        return (adoptions || []).find(a => a.adoptionId === adoptionId) || null;
     } catch (error) {
         showError('Error loading adoption');
         return null;

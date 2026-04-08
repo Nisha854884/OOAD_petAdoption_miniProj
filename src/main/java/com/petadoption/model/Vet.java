@@ -1,5 +1,7 @@
 package com.petadoption.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -36,9 +38,11 @@ public class Vet {
 
     @ManyToOne
     @JoinColumn(name = "shelter_id")
+    @JsonIgnoreProperties({"pets", "staff", "vets"})
     private Shelter shelter;
 
     @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Medical_Record> medicalRecords;
 
     // Constructors

@@ -31,6 +31,12 @@ public class PetController {
         return petService.getAvailablePets();
     }
 
+    // GET PET BY ID
+    @GetMapping("/{id}")
+    public Pet getPetById(@PathVariable int id) {
+        return petService.getPetById(id);
+    }
+
     // ADD PET (Admin/Staff)
     @PostMapping("/add")
     public String addPet(@RequestBody Pet pet,

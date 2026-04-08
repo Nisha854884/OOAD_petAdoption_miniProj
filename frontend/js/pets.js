@@ -145,8 +145,7 @@ async function viewPetDetails(petId) {
 
 // Close modal
 function closeModal() {
-    const modal = document.querySelector('.details-modal');
-    if (modal) modal.remove();
+    document.querySelectorAll('.details-modal, .form-modal').forEach(modal => modal.remove());
 }
 
 // Add pet form (Admin/Staff)

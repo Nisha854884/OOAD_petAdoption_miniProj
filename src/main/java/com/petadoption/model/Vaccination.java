@@ -1,5 +1,6 @@
 package com.petadoption.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ public class Vaccination {
 
     @ManyToOne
     @JoinColumn(name = "pet_id", nullable = false)
+    @JsonIgnoreProperties({"adoptions", "medicalRecords", "vaccinations"})
     private Pet pet;
 
     @Column(name = "vaccine_name", nullable = false)

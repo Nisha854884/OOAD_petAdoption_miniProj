@@ -1,5 +1,7 @@
 package com.petadoption.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,6 +18,7 @@ public class Adopter {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"password", "adopter", "admin", "staff"})
     private User user;
 
     @NotBlank(message = "Name cannot be blank")
@@ -34,6 +37,7 @@ public class Adopter {
     private String experienceLevel;
 
     @OneToMany(mappedBy = "adopter", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Adoption> adoptions;
 
     public Adopter() {}

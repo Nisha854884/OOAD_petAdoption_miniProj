@@ -1,5 +1,6 @@
 package com.petadoption.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -13,10 +14,12 @@ public class Adoption {
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
+    @JsonIgnoreProperties({"adoptions", "medicalRecords", "vaccinations"})
     private Pet pet;
 
     @ManyToOne
     @JoinColumn(name = "adopter_id")
+    @JsonIgnoreProperties({"adoptions", "user"})
     private Adopter adopter;
 
     private LocalDate adoptionDate;
