@@ -246,7 +246,7 @@
             if (!isValid) return;
 
             try {
-                const result = await signup(username, password);
+                const result = await signup(username, password, role);
                 
                 if (result) {
                     showSuccess('Account created successfully! Redirecting to login...');

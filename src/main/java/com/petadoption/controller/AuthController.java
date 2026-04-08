@@ -28,7 +28,19 @@ public class AuthController {
     
     // SIGNUP
     // Add this inner class or create a separate file
-    record SignupRequest(String username, String password) {}
+    record SignupRequest(String username, String password, String role) {}
+
+    private User.Role parseRole(String role) {
+        if (role == null || role.isBlank()) {
+            return User.Role.Adopter;
+        }
+        return switch (role.trim().toUpperCase()) {
+            case "ADMIN" -> User.Role.Admin;
+            case "STAFF" -> User.Role.Staff;
+            case "ADOPTER" -> User.Role.Adopter;
+            default -> throw new IllegalArgumentException("Invalid role: " + role);
+        };
+    }
 
     @PostMapping("/signup")
     @ResponseBody
@@ -37,10 +49,12 @@ public class AuthController {
             User user = new User();
             user.setUsername(request.username());
             user.setPassword(request.password());
-            user.setRole(User.Role.Adopter);
+            user.setRole(parseRole(request.role()));
             user.setCreatedAt(java.time.LocalDateTime.now());
             authService.signup(user);
             return ResponseEntity.ok("Signup successful!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Signup failed: " + e.getMessage());
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(409).body("Signup failed: Username already exists");
         } catch (Exception e) {

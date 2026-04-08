@@ -146,6 +146,12 @@
         window.addEventListener('DOMContentLoaded', function() {
             checkAuthStatus();
             const user = getCurrentUser();
+            const role = (user.role || '').toUpperCase();
+            if (role !== 'ADMIN') {
+                alert('Access denied. This dashboard is for admins only.');
+                window.location.href = 'login.html';
+                return;
+            }
             document.getElementById('username').textContent = user.username || 'Admin';
             loadOverview();
         });

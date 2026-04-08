@@ -96,9 +96,10 @@
             // Check authentication
             checkAuthStatus();
             const user = getCurrentUser();
+            const role = (user.role || '').toUpperCase();
             
             // Verify user is staff
-            if (user.role !== 'STAFF') {
+            if (role !== 'STAFF') {
                 alert('Access denied. This dashboard is for staff only.');
                 window.location.href = 'login.html';
                 return;

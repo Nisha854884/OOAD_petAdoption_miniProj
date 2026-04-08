@@ -26,9 +26,11 @@ public class AuthService {
         return null;
     }
 
-    // SIGNUP (Adopter only)
+    // SIGNUP
     public User signup(User user) {
-        user.setRole(User.Role.Adopter);
+        if (user.getRole() == null) {
+            user.setRole(User.Role.Adopter);
+        }
         return userRepository.save(user);
     }
 }

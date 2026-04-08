@@ -12,6 +12,14 @@ function getUserRole() {
     return user.role || null;
 }
 
+function normalizeRoleForApi(role) {
+    const normalized = (role || '').toUpperCase();
+    if (normalized === 'ADMIN') return 'Admin';
+    if (normalized === 'STAFF') return 'Staff';
+    if (normalized === 'ADOPTER') return 'Adopter';
+    return role;
+}
+
 // Make API call with error handling
 async function apiCall(endpoint, method = 'GET', data = null) {
     const user = getCurrentUser();
@@ -19,7 +27,7 @@ async function apiCall(endpoint, method = 'GET', data = null) {
     
     // Add role parameter for authorization
     if (user.role) {
-        url.searchParams.append('role', user.role);
+        url.searchParams.append('role', normalizeRoleForApi(user.role));
     }
     
     const options = {
@@ -66,8 +74,8 @@ async function login(username, password) {
     return await response.text();
 }
 
-async function signup(username, password) {
-    return apiCall('/auth/signup', 'POST', { username, password });
+async function signup(username, password, role = 'Adopter') {
+    return apiCall('/auth/signup', 'POST', { username, password, role });
 }
 
 // Pet APIs

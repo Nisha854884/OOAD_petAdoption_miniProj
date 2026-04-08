@@ -152,7 +152,7 @@
         window.addEventListener('DOMContentLoaded', function() {
             const user = getCurrentUser();
             
-            if (user && user.userId) {
+            if (user && user.role) {
                 // User is logged in, redirect based on role
                 console.log('User logged in with role:', user.role);
                 
@@ -166,7 +166,7 @@
 
                 // Redirect based on role
                 setTimeout(() => {
-                    switch(user.role) {
+                    switch((user.role || '').toUpperCase()) {
                         case 'ADMIN':
                             window.location.href = 'admin-dashboard.html';
                             break;

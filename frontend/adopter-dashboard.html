@@ -145,9 +145,10 @@
             // Check authentication
             checkAuthStatus();
             const user = getCurrentUser();
+            const role = (user.role || '').toUpperCase();
             
             // Verify user is adopter
-            if (user.role !== 'ADOPTER') {
+            if (role !== 'ADOPTER') {
                 alert('Access denied. This portal is for adopters only.');
                 window.location.href = 'login.html';
                 return;

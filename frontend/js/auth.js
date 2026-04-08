@@ -87,10 +87,10 @@ async function handleLogin(event) {
             return;
         }
         
-        // Extract role from response and normalize for consistent checks.
-        let role = 'ADOPTER';
-        if (response.includes('Admin')) role = 'ADMIN';
-        if (response.includes('Staff')) role = 'STAFF';
+        // Extract role from response using backend role casing.
+        let role = 'Adopter';
+        if (response.includes('Admin')) role = 'Admin';
+        if (response.includes('Staff')) role = 'Staff';
         
         // Store user info
         const userData = {
@@ -104,9 +104,10 @@ async function handleLogin(event) {
         
         // Redirect based on role
         setTimeout(() => {
-            if (role === 'ADMIN') {
+            const normalizedRole = role.toUpperCase();
+            if (normalizedRole === 'ADMIN') {
                 window.location.href = 'admin-dashboard.html';
-            } else if (role === 'STAFF') {
+            } else if (normalizedRole === 'STAFF') {
                 window.location.href = 'staff-dashboard.html';
             } else {
                 window.location.href = 'adopter-dashboard.html';
