@@ -115,11 +115,11 @@ async function handleLogin(event) {
         setTimeout(() => {
             const normalizedRole = role.toUpperCase();
             if (normalizedRole === 'ADMIN') {
-                window.location.href = 'admin-dashboard.html?v=20260408r2';
+                window.location.href = 'admin-dashboard.html?v=20260408r3';
             } else if (normalizedRole === 'STAFF') {
-                window.location.href = 'staff-dashboard.html?v=20260408r2';
+                window.location.href = 'staff-dashboard.html?v=20260408r3';
             } else {
-                window.location.href = 'adopter-dashboard.html?v=20260408r2';
+                window.location.href = 'adopter-dashboard.html?v=20260408r3';
             }
         }, 1000);
         
@@ -265,11 +265,11 @@ function preventLoggedInAccess() {
         }
 
         if (role === 'ADMIN') {
-            window.location.href = 'admin-dashboard.html?v=20260408r2';
+            window.location.href = 'admin-dashboard.html?v=20260408r3';
         } else if (role === 'STAFF') {
-            window.location.href = 'staff-dashboard.html?v=20260408r2';
+            window.location.href = 'staff-dashboard.html?v=20260408r3';
         } else {
-            window.location.href = 'adopter-dashboard.html?v=20260408r2';
+            window.location.href = 'adopter-dashboard.html?v=20260408r3';
         }
     }
 }

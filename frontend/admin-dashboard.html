@@ -11,10 +11,10 @@
     <nav>
         <div class="logo">🐾 Pet Adoption Admin</div>
         <ul class="nav-links">
-            <li><a href="#" onclick="switchSection('overview')">Dashboard</a></li>
-            <li><a href="#" onclick="switchSection('pets')">Pets</a></li>
-            <li><a href="#" onclick="switchSection('adoptions')">Adoptions</a></li>
-            <li><a href="#" onclick="switchSection('reports')">Reports</a></li>
+            <li><a href="#" onclick="switchSection('overview'); return false;">Dashboard</a></li>
+            <li><a href="#" onclick="switchSection('pets'); return false;">Pets</a></li>
+            <li><a href="#" onclick="switchSection('adoptions'); return false;">Adoptions</a></li>
+            <li><a href="#" onclick="switchSection('reports'); return false;">Reports</a></li>
         </ul>
         <div class="user-info">
             <span id="username">Admin</span>
@@ -26,16 +26,16 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <ul>
-                <li><a href="#" class="sidebar-link active" onclick="switchSection('overview'); return false;">📊 Dashboard Overview</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('pets'); return false;">🐕 Pets</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('shelters'); return false;">🏠 Shelters</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('vets'); return false;">⚕️ Veterinarians</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('medical-records'); return false;">📋 Medical Records</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('vaccinations'); return false;">💉 Vaccinations</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('staff'); return false;">👥 Staff</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('admins'); return false;">⚙️ Admins</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('adoptions'); return false;">❤️ Adoptions</a></li>
-                <li><a href="#" class="sidebar-link" onclick="switchSection('reports'); return false;">📈 Reports</a></li>
+                <li><a href="#" class="sidebar-link active" data-section="overview" onclick="switchSection('overview'); return false;">📊 Dashboard Overview</a></li>
+                <li><a href="#" class="sidebar-link" data-section="pets" onclick="switchSection('pets'); return false;">🐕 Pets</a></li>
+                <li><a href="#" class="sidebar-link" data-section="shelters" onclick="switchSection('shelters'); return false;">🏠 Shelters</a></li>
+                <li><a href="#" class="sidebar-link" data-section="vets" onclick="switchSection('vets'); return false;">⚕️ Veterinarians</a></li>
+                <li><a href="#" class="sidebar-link" data-section="medical-records" onclick="switchSection('medical-records'); return false;">📋 Medical Records</a></li>
+                <li><a href="#" class="sidebar-link" data-section="vaccinations" onclick="switchSection('vaccinations'); return false;">💉 Vaccinations</a></li>
+                <li><a href="#" class="sidebar-link" data-section="staff" onclick="switchSection('staff'); return false;">👥 Staff</a></li>
+                <li><a href="#" class="sidebar-link" data-section="admins" onclick="switchSection('admins'); return false;">⚙️ Admins</a></li>
+                <li><a href="#" class="sidebar-link" data-section="adoptions" onclick="switchSection('adoptions'); return false;">❤️ Adoptions</a></li>
+                <li><a href="#" class="sidebar-link" data-section="reports" onclick="switchSection('reports'); return false;">📈 Reports</a></li>
             </ul>
         </div>
 
@@ -137,10 +137,10 @@
         </div>
     </div>
 
-    <script src="js/api.js?v=20260408"></script>
-    <script src="js/auth.js?v=20260408"></script>
-    <script src="js/pets.js?v=20260408"></script>
-    <script src="js/adoptions.js?v=20260408"></script>
+    <script src="js/api.js?v=20260408r3"></script>
+    <script src="js/auth.js?v=20260408r3"></script>
+    <script src="js/pets.js?v=20260408r3"></script>
+    <script src="js/adoptions.js?v=20260408r3"></script>
     <script>
         // Initialize admin dashboard
         window.addEventListener('DOMContentLoaded', function() {
@@ -149,11 +149,11 @@
             const role = (user.role || '').toUpperCase();
             if (role !== 'ADMIN') {
                 if (role === 'STAFF') {
-                    window.location.href = 'staff-dashboard.html?v=20260408r2';
+                    window.location.href = 'staff-dashboard.html?v=20260408r3';
                     return;
                 }
                 if (role === 'ADOPTER') {
-                    window.location.href = 'adopter-dashboard.html?v=20260408r2';
+                    window.location.href = 'adopter-dashboard.html?v=20260408r3';
                     return;
                 }
                 alert('Session invalid. Please login again.');
@@ -181,7 +181,10 @@
             document.getElementById(sectionId).classList.add('active');
             
             // Update sidebar highlighting
-            event.target.classList.add('active');
+            const sidebarLink = document.querySelector(`.sidebar-link[data-section="${sectionId}"]`);
+            if (sidebarLink) {
+                sidebarLink.classList.add('active');
+            }
 
             // Load content based on section
             switch(sectionId) {
@@ -404,16 +407,18 @@
                 }
 
                 let html = '<table class="staff-table"><thead><tr>' +
-                    '<th>Name</th><th>Role</th><th>Shelter</th><th>Phone</th><th>Actions</th>' +
+                    '<th>Name</th><th>Position</th><th>Shelter</th><th>Phone</th><th>Actions</th>' +
                     '</tr></thead><tbody>';
 
                 staff.forEach(s => {
+                    const staffName = s.name || s.user?.username || 'N/A';
+                    const staffPosition = s.position || s.role || 'N/A';
                     html += `
                         <tr>
-                            <td>${s.name}</td>
-                            <td>${s.role}</td>
+                            <td>${staffName}</td>
+                            <td>${staffPosition}</td>
                             <td>${s.shelter?.name || 'N/A'}</td>
-                            <td>${s.phone}</td>
+                            <td>${s.phone || 'N/A'}</td>
                             <td>
                                 <button onclick="editStaffForm(${s.staffId})" class="btn-small">Edit</button>
                                 <button onclick="deleteStaffConfirm(${s.staffId})" class="btn-small danger">Delete</button>
@@ -478,12 +483,16 @@
                     return;
                 }
 
+                const normalized = Array.isArray(report)
+                    ? report.map(item => Array.isArray(item) ? { status: item[0], count: item[1] } : item)
+                    : Object.entries(report).map(([status, count]) => ({ status, count }));
+
                 let html = '<div class="statistics-grid">';
-                Object.entries(report).forEach(([status, count]) => {
+                normalized.forEach(({ status, count }) => {
                     html += `
                         <div class="stat-card">
-                            <h3>${status}</h3>
-                            <p class="stat-number">${count}</p>
+                            <h3>${status ?? 'Unknown'}</h3>
+                            <p class="stat-number">${count ?? 0}</p>
                         </div>
                     `;
                 });
@@ -513,12 +522,20 @@
                     '</tr></thead><tbody>';
 
                 utilization.forEach(item => {
-                    const util = ((item.current / item.capacity) * 100).toFixed(1);
+                    const shelterName = Array.isArray(item) ? item[1] : (item.shelterName || item.name);
+                    const capacity = Number(Array.isArray(item) ? item[2] : item.capacity);
+                    const current = Number(Array.isArray(item) ? item[3] : (item.current ?? item.totalPets));
+                    const utilizationPercent = Number(Array.isArray(item) ? item[4] : item.utilizationPercent);
+                    const utilRaw = Number.isFinite(utilizationPercent)
+                        ? utilizationPercent
+                        : (capacity > 0 ? (current / capacity) * 100 : 0);
+                    const util = Math.max(0, utilRaw).toFixed(1);
+
                     html += `
                         <tr>
-                            <td>${item.shelterName}</td>
-                            <td>${item.capacity}</td>
-                            <td>${item.current}</td>
+                            <td>${shelterName || 'N/A'}</td>
+                            <td>${Number.isFinite(capacity) ? capacity : 'N/A'}</td>
+                            <td>${Number.isFinite(current) ? current : 'N/A'}</td>
                             <td>
                                 <div style="background: #ecf0f1; border-radius: 10px; overflow: hidden; height: 20px;">
                                     <div style="background: ${util > 80 ? '#e74c3c' : util > 60 ? '#f39c12' : '#27ae60'}; width: ${util}%; height: 100%; transition: width 0.3s;"></div>

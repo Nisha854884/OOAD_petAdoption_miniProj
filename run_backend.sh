@@ -10,4 +10,4 @@ if [[ -n "$pid" ]]; then
 fi
 
 echo "Starting backend on http://localhost:8081/api ..."
-./mvnw spring-  :run
+./mvnw spring-boot:run

@@ -1,8 +1,8 @@
 package com.petadoption.controller;
 
-import com.petadoption.model.Adopter;
+import com.petadoption.dto.SignupRequestDTO;
 import com.petadoption.model.User;
-import com.petadoption.service.AuthService;
+import com.petadoption.patterns.auth.facade.AuthFacade;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +15,14 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController {
     @Autowired
-    private AuthService authService;
+    private AuthFacade authFacade;
 
     // LOGIN
     @PostMapping("/login")
     @ResponseBody
     public ResponseEntity<?> login(@RequestParam String username,
                                    @RequestParam String password) {
-        User user = authService.login(username, password);
+        User user = authFacade.login(username, password);
         if (user != null) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login successful");
@@ -35,50 +35,12 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
-    
-    // SIGNUP
-    // Add this inner class or create a separate file
-    record SignupRequest(String username,
-                         String password,
-                         String role,
-                         String name,
-                         String phone,
-                         String address,
-                         String experienceLevel) {}
-
-    private User.Role parseRole(String role) {
-        if (role == null || role.isBlank()) {
-            return User.Role.Adopter;
-        }
-        return switch (role.trim().toUpperCase()) {
-            case "ADMIN" -> User.Role.Admin;
-            case "STAFF" -> User.Role.Staff;
-            case "ADOPTER" -> User.Role.Adopter;
-            default -> throw new IllegalArgumentException("Invalid role: " + role);
-        };
-    }
 
     @PostMapping("/signup")
     @ResponseBody
-    public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<String> signup(@RequestBody SignupRequestDTO request) {
         try {
-            User user = new User();
-            user.setUsername(request.username());
-            user.setPassword(request.password());
-            user.setRole(parseRole(request.role()));
-            user.setCreatedAt(java.time.LocalDateTime.now());
-
-            if (user.getRole() == User.Role.Adopter) {
-                Adopter adopter = new Adopter();
-                adopter.setUser(user);
-                adopter.setName(request.name() != null && !request.name().isBlank() ? request.name() : request.username());
-                adopter.setPhone(request.phone() != null && !request.phone().isBlank() ? request.phone() : "0000000000");
-                adopter.setAddress(request.address() != null && !request.address().isBlank() ? request.address() : "Address not provided");
-                adopter.setExperienceLevel(request.experienceLevel() != null && !request.experienceLevel().isBlank() ? request.experienceLevel() : "Beginner");
-                user.setAdopter(adopter);
-            }
-
-            authService.signup(user);
+            authFacade.signup(request);
             return ResponseEntity.ok("Signup successful!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Signup failed: " + e.getMessage());
