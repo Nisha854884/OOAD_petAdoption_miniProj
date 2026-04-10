@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Adoption System - Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50' font-size='50' text-anchor='middle' dy='.3em'>🐾</text></svg>" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>🐾 Pet Adoption</h1>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="toggleAuthForm('login')">Login</button>
+                <button class="tab-btn" onclick="toggleAuthForm('signup')">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input 
+                        type="text" 
+                        id="login-username" 
+                        placeholder="Enter your username"
+                        required
+                    >
+                    <span class="error-message" id="login-username-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input 
+                        type="password" 
+                        id="login-password" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                    <span class="error-message" id="login-password-error"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Login</button>
+                <p style="text-align: center; margin-top: 1rem; color: #666;">
+                    Demo: Use any valid credentials from the database
+                </p>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <input 
+                        type="text" 
+                        id="signup-username" 
+                        placeholder="Choose a username"
+                        required
+                    >
+                    <span class="error-message" id="signup-username-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input 
+                        type="email" 
+                        id="signup-email" 
+                        placeholder="Enter your email"
+                        required
+                    >
+                    <span class="error-message" id="signup-email-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input 
+                        type="password" 
+                        id="signup-password" 
+                        placeholder="Create a password (min 6 characters)"
+                        required
+                    >
+                    <span class="error-message" id="signup-password-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-password-confirm">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="signup-password-confirm" 
+                        placeholder="Confirm your password"
+                        required
+                    >
+                    <span class="error-message" id="signup-password-confirm-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-role">Role</label>
+                    <select id="signup-role" required>
+                        <option value="">Select your role</option>
+                        <option value="ADOPTER">Adopter (Pet Seeker)</option>
+                        <option value="STAFF">Staff Member</option>
+                        <option value="ADMIN">Administrator</option>
+                    </select>
+                    <span class="error-message" id="signup-role-error"></span>
+                </div>
+
+                <!-- Additional fields for Adopter -->
+                <div id="adopter-fields" class="hidden">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="signup-name" 
+                            placeholder="Enter your full name"
+                        >
+                        <span class="error-message" id="signup-name-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-phone">Phone Number</label>
+                        <input 
+                            type="text" 
+                            id="signup-phone" 
+                            placeholder="Enter 10-digit phone number"
+                        >
+                        <span class="error-message" id="signup-phone-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-address">Address</label>
+                        <input 
+                            type="text" 
+                            id="signup-address" 
+                            placeholder="Enter your address"
+                        >
+                        <span class="error-message" id="signup-address-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-experience">Experience Level</label>
+                        <select id="signup-experience">
+                            <option value="">Select experience level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Experienced">Experienced</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+
+            <!-- Alerts Container -->
+            <div id="alert-container" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    <script src="/js/api.js?v=20260408"></script>
+    <script src="/js/auth.js?v=20260408"></script>
+    <script>
+        // On page load, check if user is already logged in
+        window.addEventListener('DOMContentLoaded', function() {
+            preventLoggedInAccess();
+            
+            // Show/hide adopter-specific fields based on role selection
+            const roleSelect = document.getElementById('signup-role');
+            roleSelect.addEventListener('change', function() {
+                const adopterFields = document.getElementById('adopter-fields');
+                if (this.value === 'ADOPTER') {
+                    adopterFields.classList.remove('hidden');
+                } else {
+                    adopterFields.classList.add('hidden');
+                }
+            });
+        });
+
+        // Custom signup handler to include additional adopter fields
+        async function handleSignup(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const passwordConfirm = document.getElementById('signup-password-confirm').value;
+            const role = document.getElementById('signup-role').value;
+
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+            // Validate fields
+            let isValid = true;
+
+            // Username validation
+            if (!validateField('username', username)) {
+                document.getElementById('signup-username-error').textContent = 
+                    'Username must be 3-50 characters';
+                isValid = false;
+            }
+
+            // Email validation
+            if (!validateField('email', email)) {
+                document.getElementById('signup-email-error').textContent = 
+                    'Invalid email format';
+                isValid = false;
+            }
+
+            // Password validation
+            if (!validateField('password', password)) {
+                document.getElementById('signup-password-error').textContent = 
+                    'Password must be at least 6 characters';
+                isValid = false;
+            }
+
+            // Password confirmation
+            if (password !== passwordConfirm) {
+                document.getElementById('signup-password-confirm-error').textContent = 
+                    'Passwords do not match';
+                isValid = false;
+            }
+
+            // Additional validation for adopter
+            if (role === 'ADOPTER') {
+                const name = document.getElementById('signup-name').value.trim();
+                const phone = document.getElementById('signup-phone').value.trim();
+                const address = document.getElementById('signup-address').value.trim();
+
+                if (!validateField('name', name)) {
+                    document.getElementById('signup-name-error').textContent = 
+                        'Name must be 2-100 characters';
+                    isValid = false;
+                }
+
+                if (!validateField('phone', phone)) {
+                    document.getElementById('signup-phone-error').textContent = 
+                        'Phone must be 10 digits';
+                    isValid = false;
+                }
+
+                if (!validateField('address', address)) {
+                    document.getElementById('signup-address-error').textContent = 
+                        'Address must be 5-255 characters';
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) return;
+
+            try {
+                const result = await signup(username, password, role, {
+                    name: document.getElementById('signup-name').value.trim(),
+                    phone: document.getElementById('signup-phone').value.trim(),
+                    address: document.getElementById('signup-address').value.trim(),
+                    experienceLevel: document.getElementById('signup-experience').value
+                });
+                
+                if (result) {
+                    showSuccess('Account created successfully! Redirecting to login...');
+                    setTimeout(() => {
+                        document.getElementById('signupForm').reset();
+                        toggleAuthForm('login');
+                        document.getElementById('signup-name').value = '';
+                        document.getElementById('signup-phone').value = '';
+                        document.getElementById('signup-address').value = '';
+                    }, 1500);
+                }
+            } catch (error) {
+                showError(error.message || 'Signup failed. Please try again.');
+            }
+        }
+
+        // Alert display functions
+        function showSuccess(message) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = 'alert success';
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        function showError(message) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = 'alert error';
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

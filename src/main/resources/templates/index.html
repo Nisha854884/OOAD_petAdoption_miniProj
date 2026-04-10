@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Adoption Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .landing-container h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .landing-container p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .landing-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .landing-btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .landing-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .landing-btn.primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .landing-btn.primary:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-card h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-container">
+        <div id="content">
+            <h1>🐾 Pet Adoption Management System</h1>
+            <p>Find your perfect companion or manage your shelter operations</p>
+            
+            <div class="landing-buttons">
+                <a href="/login" class="landing-btn primary">Login</a>
+                <a href="/login" class="landing-btn">Sign Up</a>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <h3>❤️ Find Pets</h3>
+                    <p>Browse available pets and find your perfect match. View detailed information and vaccination records.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📋 Easy Application</h3>
+                    <p>Apply for adoption with just a few clicks. Track your application status in real-time.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏢 Manage Operations</h3>
+                    <p>Admin and staff can manage shelters, pets, medical records, and adoptions efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js?v=20260408"></script>
+    <script src="/js/auth.js?v=20260408"></script>
+    <script>
+        // Check if user is logged in and redirect accordingly
+        window.addEventListener('DOMContentLoaded', function() {
+            const user = getCurrentUser();
+            
+            if (user && user.role) {
+                // User is logged in, redirect based on role
+                console.log('User logged in with role:', user.role);
+                
+                // Show loading message
+                document.getElementById('content').innerHTML = `
+                    <div class="loading">
+                        <span>Redirecting to your dashboard</span>
+                        <div class="spinner"></div>
+                    </div>
+                `;
+
+                // Redirect based on role
+                setTimeout(() => {
+                    switch((user.role || '').toUpperCase()) {
+                        case 'ADMIN':
+                            window.location.href = '/admin';
+                            break;
+                        case 'STAFF':
+                            window.location.href = '/staff';
+                            break;
+                        case 'ADOPTER':
+                            window.location.href = '/adopter';
+                            break;
+                        default:
+                            console.log('Unknown role, clearing stale session:', user.role);
+                            localStorage.removeItem('currentUser');
+                            window.location.href = '/login';
+                    }
+                }, 1000);
+            }
+            // If not logged in, stay on landing page
+        });
+    </script>
+</body>
+</html>
